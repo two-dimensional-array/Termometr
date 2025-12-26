@@ -1,0 +1,3 @@
+[submodule "components/HTU21D/lib"]
+	path = components/HTU21D/lib
+	url = https://github.com/two-dimensional-array/HTU21D.git
