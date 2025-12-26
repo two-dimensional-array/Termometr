@@ -8,6 +8,8 @@
 
 static bool get_termometr_request(const cJSON * payload, cJSON * response);
 static bool set_wifi_credentials_request(const cJSON * payload, cJSON * response);
+static bool get_wifi_credentials_request(const cJSON * payload, cJSON * response);
+static bool reset_wifi_request(const cJSON * payload, cJSON * response);
 
 web_server_api_t termometr_api_handler = {
     .uri = "/api/readings",
@@ -15,10 +17,22 @@ web_server_api_t termometr_api_handler = {
     .handler_callback = get_termometr_request
 };
 
-web_server_api_t wifi_config_api_handler = {
-    .uri = "/configure",
+web_server_api_t wifi_connect_api_handler = {
+    .uri = "/api/connect_wifi",
     .type = HTTP_POST,
     .handler_callback = set_wifi_credentials_request
+};
+
+web_server_api_t wifi_credentials_api_handler = {
+    .uri = "/api/wifi_credentials",
+    .type = HTTP_GET,
+    .handler_callback = get_wifi_credentials_request
+};
+
+web_server_api_t wifi_reset_api_handler = {
+    .uri = "/api/reset_wifi",
+    .type = HTTP_POST,
+    .handler_callback = reset_wifi_request
 };
 
 void app_main(void)
@@ -36,7 +50,9 @@ void app_main(void)
     termometr_start();
 
     web_server_register_api_handler(&termometr_api_handler);
-    web_server_register_api_handler(&wifi_config_api_handler);
+    web_server_register_api_handler(&wifi_connect_api_handler);
+    web_server_register_api_handler(&wifi_credentials_api_handler);
+    web_server_register_api_handler(&wifi_reset_api_handler);
 
     wifi_init();
     web_server_start();
@@ -62,6 +78,23 @@ static bool set_wifi_credentials_request(const cJSON * payload, cJSON * response
     const char *password = (cJSON_IsString(password_json) && (password_json->valuestring != NULL)) ? password_json->valuestring : "";
 
     wifi_save_sta_credentials(ssid, password);
+    esp_restart();  // Restart to apply new WiFi settings
+    return true;
+}
+
+static bool get_wifi_credentials_request(const cJSON * payload, cJSON * response)
+{
+    const char* ssid = wifi_get_sta_ssid();
+    const char* password = wifi_get_sta_password();
+
+    cJSON_AddStringToObject(response, "ssid", ssid ? ssid : "");
+    cJSON_AddStringToObject(response, "password", password ? password : "");
+    return true;
+}
+
+static bool reset_wifi_request(const cJSON * payload, cJSON * response)
+{
+    wifi_reset_sta_credentials();
     esp_restart();  // Restart to apply new WiFi settings
     return true;
 }

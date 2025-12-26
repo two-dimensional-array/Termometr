@@ -4,20 +4,40 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>ESP32 Sensor</title>
+  <style>
+    .tabs { margin-bottom: 1em; }
+    .tablinks { padding: 0.5em 1em; border: 1px solid #ccc; background:#eee; cursor:pointer; margin-right:0.25em; border-radius:4px; }
+    .tablinks.active { background:#ddd; font-weight:bold; }
+    .tabcontent { display:none; }
+    .tabcontent.active { display:block; }
+    label { display:block; margin-top:0.5em; }
+    input { display:block; margin-top:0.25em; margin-bottom:0.5em; padding:0.25em; width:100%; max-width:300px; }
+    button { padding:0.4em 0.7em; }
+  </style>
 </head>
 <body>
-  <h1>ESP32 Sensor Readings</h1>
-  <p>Temperature: <span id="temp">--</span> &deg;C</p>
-  <p>Relative Humidity: <span id="rh">--</span> %</p>
+  <div class="tabs">
+    <button class="tablinks active" id="tabSensorBtn">Sensor</button>
+    <button class="tablinks" id="tabWifiBtn">Wi‑Fi</button>
+  </div>
 
-  <h2>Connect to Wi-Fi</h2>
-  <form id="wifiForm" onsubmit="return false;">
-    <label for="ssid">SSID</label>
-    <input id="ssid" name="ssid" placeholder="SSID">
-    <label for="password">Password</label>
-    <input id="password" name="password" placeholder="Password" type="password">
-    <button id="connectBtn" onclick="submitWifi()">Connect</button>
-  </form>
+  <div id="sensorTab" class="tabcontent active">
+    <h1>ESP32 Sensor Readings</h1>
+    <p>Temperature: <span id="temp">--</span> &deg;C</p>
+    <p>Relative Humidity: <span id="rh">--</span> %</p>
+  </div>
+
+  <div id="wifiTab" class="tabcontent">
+    <h2>Connect to Wi-Fi</h2>
+    <form id="wifiForm" onsubmit="return false;">
+      <label for="ssid">SSID</label>
+      <input id="ssid" name="ssid">
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password">
+      <button id="connectBtn" onclick="submitWifi()">Connect</button>
+      <button id="resetWifiBtn" onclick="resetWifi()" disabled="true">Reset</button>
+    </form>
+  </div>
 
   <script src="/main.js"></script>
 </body>

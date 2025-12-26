@@ -3,5 +3,8 @@
 
 void wifi_init();
 void wifi_save_sta_credentials(const char *ssid, const char *password);
+void wifi_reset_sta_credentials();
+const char* wifi_get_sta_ssid();
+const char* wifi_get_sta_password();
 
 #endif // __WIFI_H__
