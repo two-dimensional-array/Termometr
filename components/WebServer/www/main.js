@@ -39,6 +39,39 @@ function fetchWifiCredentials(){
     .catch(e => console.error(e));
 }
 
+function submitServer(){
+  const url = document.getElementById('serverUrl').value;
+  const port = Number(document.getElementById('serverPort').value);
+  const deviceName = document.getElementById('deviceName').value;
+  if (url && port && deviceName) {
+      fetch('/api/connect_server', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({url: url, port: port, device_name: deviceName})
+    });
+  }
+}
+
+function resetServer(){
+    fetch('/api/reset_server', {
+    method: 'POST'
+  });
+}
+
+function fetchServerInfo(){
+  fetch('/api/server_info')
+    .then(r => r.json())
+    .then(d => {
+      document.getElementById('serverUrl').placeholder = d.url ? d.url : 'URL or IP address';
+      document.getElementById('serverPort').placeholder = d.port ? d.port : 'Port';
+      document.getElementById('deviceName').placeholder = d.device_name ? d.device_name : 'Device Name';
+      if (d.url) {
+        document.getElementById('resetServerBtn').disabled = false;
+      }
+    })
+    .catch(e => console.error(e));
+}
+
 function showTab(tabId, btn){
   document.querySelectorAll('.tabcontent').forEach(c => c.classList.remove('active'));
   document.querySelectorAll('.tablinks').forEach(b => b.classList.remove('active'));
@@ -49,8 +82,10 @@ function showTab(tabId, btn){
 document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('tabSensorBtn').addEventListener('click', function(){ showTab('sensorTab', this); });
   document.getElementById('tabWifiBtn').addEventListener('click', function(){ showTab('wifiTab', this); });
+  document.getElementById('tabServerBtn').addEventListener('click', function(){ showTab('serverTab', this); });
 });
 
 fetchReadings();
 fetchWifiCredentials();
+fetchServerInfo();
 setInterval(fetchReadings, 5000);

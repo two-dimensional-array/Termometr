@@ -72,6 +72,12 @@ void termometr_stop(void)
     }
 }
 
+void termometr_single_measurement(void)
+{
+    temperature = HTU21D_GetTemperature(&sensor);
+    humidity = HTU21D_GetRelativeHumidity(&sensor);
+}
+
 float termometr_get_temperature(void)
 {
     return temperature;
@@ -84,6 +90,5 @@ float termometr_get_humidity(void)
 
 static void measurement_timer_callback(TimerHandle_t xTimer)
 {
-    temperature = HTU21D_GetTemperature(&sensor);
-    humidity = HTU21D_GetRelativeHumidity(&sensor);
+    termometr_single_measurement();
 }

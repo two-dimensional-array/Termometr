@@ -19,6 +19,7 @@
   <div class="tabs">
     <button class="tablinks active" id="tabSensorBtn">Sensor</button>
     <button class="tablinks" id="tabWifiBtn">Wi‑Fi</button>
+    <button class="tablinks" id="tabServerBtn">Server</button>
   </div>
 
   <div id="sensorTab" class="tabcontent active">
@@ -34,9 +35,20 @@
       <input id="ssid" name="ssid">
       <label for="password">Password</label>
       <input id="password" name="password" type="password">
-      <button id="connectBtn" onclick="submitWifi()">Connect</button>
+      <button id="connectWifiBtn" onclick="submitWifi()">Connect</button>
       <button id="resetWifiBtn" onclick="resetWifi()" disabled="true">Reset</button>
     </form>
+  </div>
+
+  <div id="serverTab" class="tabcontent">
+    <label for="serverUrl">Server URL</label>
+    <input id="serverUrl" name="serverUrl">
+    <label for="serverPort">Server port</label>
+    <input id="serverPort" name="serverPort">
+    <label for="deviceName">Device name</label>
+    <input id="deviceName" name="deviceName">
+    <button id="connectServerBtn" onclick="submitServer()">Connect</button>
+    <button id="resetServerBtn" onclick="resetServer()" disabled="true">Reset</button>
   </div>
 
   <script src="/main.js"></script>

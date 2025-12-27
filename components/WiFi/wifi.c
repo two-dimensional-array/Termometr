@@ -18,7 +18,7 @@ static char sta_password[32] = {0};
 
 static bool read_wifi_credentials(char *out_ssid, size_t ssid_size, char *out_password, size_t password_size);
 
-void wifi_init()
+wifi_state_t wifi_init()
 {
     size_t ssid_len = sizeof(sta_ssid);
     size_t password_len = sizeof(sta_password);
@@ -44,6 +44,14 @@ void wifi_init()
     {
         wifi_start_softap();
     }
+
+    return start_sta ? WIFI_STATE_STA : WIFI_STATE_SOFT_AP;
+}
+
+void wifi_stop()
+{
+    esp_wifi_stop();
+    esp_wifi_deinit();
 }
 
 void wifi_save_sta_credentials(const char *ssid, const char *password)

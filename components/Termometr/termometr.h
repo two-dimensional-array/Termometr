@@ -12,6 +12,8 @@ void termometr_deinit(void);
 void termometr_start(void);
 void termometr_stop(void);
 
+void termometr_single_measurement(void);
+
 float termometr_get_temperature(void);
 float termometr_get_humidity(void);
 
