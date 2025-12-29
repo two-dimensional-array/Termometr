@@ -104,7 +104,7 @@ void app_main(void)
         if (web_client_result == ESP_OK)
         {
             wifi_stop();
-            esp_sleep_enable_timer_wakeup(5000 * 1000); // 5 seconds
+            esp_sleep_enable_timer_wakeup(30 * 1000 * 1000); // 30 seconds
             esp_deep_sleep_start();
             esp_restart();
             return;
@@ -188,10 +188,12 @@ static bool get_host_info_request(const cJSON * payload, cJSON * response)
 {
     const char* url = web_client_get_host_url();
     uint16_t port = web_client_get_host_port();
+    const char* device_name = web_client_get_device_name();
 
     cJSON_AddStringToObject(response, "url", url ? url : "");
     cJSON_AddNumberToObject(response, "port", port);
-    esp_restart();  // Restart to apply new WiFi settings
+    cJSON_AddStringToObject(response, "device_name", device_name ? device_name : "");
+
     return true;
 }
 

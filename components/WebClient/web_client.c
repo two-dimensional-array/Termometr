@@ -9,7 +9,7 @@
 static const char *TAG = "web_client";
 static nvs_handle_t host_info_handle;
 
-static char host_url[32] = {0};
+static char host_url[64] = {0};
 static uint16_t host_port = 0;
 static char device_name[32] = {0};
 
@@ -60,10 +60,19 @@ esp_err_t web_client_post(const char *path, const char* payload_raw_str, const c
         return ESP_ERR_INVALID_STATE;
     }
 
+    char* url_buffer = NULL;
+
+    if (host_port == 0)
+    {
+        asprintf(&url_buffer, "%s%s", host_url, path);
+    }
+    else
+    {
+        asprintf(&url_buffer, "%s:%d%s", host_url, host_port, path);
+    }
+
     esp_http_client_config_t config = {
-        .host = host_url,
-        .port = host_port,
-        .path = path,
+        .url = url_buffer,
         .method = HTTP_METHOD_POST,
         .timeout_ms = 5000,
     };
@@ -71,6 +80,7 @@ esp_err_t web_client_post(const char *path, const char* payload_raw_str, const c
     esp_http_client_handle_t client = esp_http_client_init(&config);
     if (!client) {
         ESP_LOGE(TAG, "Failed to initialize http client");
+        free(url_buffer);
         return ESP_FAIL;
     }
 
@@ -84,6 +94,7 @@ esp_err_t web_client_post(const char *path, const char* payload_raw_str, const c
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "Failed to set post field: %d", err);
         esp_http_client_cleanup(client);
+        free(url_buffer);
         return err;
     }
 
@@ -97,7 +108,7 @@ esp_err_t web_client_post(const char *path, const char* payload_raw_str, const c
     }
 
     esp_http_client_cleanup(client);
-
+    free(url_buffer);
     return err;
 }
 

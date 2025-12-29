@@ -26,24 +26,29 @@ function resetWifi(){
   });
 }
 
+// Returns Promise<boolean> — resolves to true when we got a successful response
 function fetchWifiCredentials(){
-  fetch('/api/wifi_credentials')
-    .then(r => r.json())
+  return fetch('/api/wifi_credentials')
+    .then(r => {
+      if (!r.ok) throw new Error('Network response was not ok');
+      return r.json();
+    })
     .then(d => {
       document.getElementById('ssid').placeholder = d.ssid ? d.ssid : 'SSID';
       document.getElementById('password').placeholder = d.password ? d.password : 'Password';
       if (d.ssid) {
         document.getElementById('resetWifiBtn').disabled = false;
       }
+      return true;
     })
-    .catch(e => console.error(e));
+    .catch(e => { console.error(e); return false; });
 }
 
 function submitServer(){
   const url = document.getElementById('serverUrl').value;
   const port = Number(document.getElementById('serverPort').value);
   const deviceName = document.getElementById('deviceName').value;
-  if (url && port && deviceName) {
+  if (url && deviceName) {
       fetch('/api/connect_server', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -58,9 +63,13 @@ function resetServer(){
   });
 }
 
+// Returns Promise<boolean> — resolves to true when we got a successful response
 function fetchServerInfo(){
-  fetch('/api/server_info')
-    .then(r => r.json())
+  return fetch('/api/server_info')
+    .then(r => {
+      if (!r.ok) throw new Error('Network response was not ok');
+      return r.json();
+    })
     .then(d => {
       document.getElementById('serverUrl').placeholder = d.url ? d.url : 'URL or IP address';
       document.getElementById('serverPort').placeholder = d.port ? d.port : 'Port';
@@ -68,8 +77,20 @@ function fetchServerInfo(){
       if (d.url) {
         document.getElementById('resetServerBtn').disabled = false;
       }
+      return true;
     })
-    .catch(e => console.error(e));
+    .catch(e => { console.error(e); return false; });
+}
+
+// Helper: call async fn repeatedly every intervalMs until it resolves true
+function startPolling(fn, intervalMs){
+  // initial try
+  fn().then(success => {
+    if (success) return;
+    const id = setInterval(() => {
+      fn().then(s => { if (s) clearInterval(id); });
+    }, intervalMs);
+  });
 }
 
 function showTab(tabId, btn){
@@ -83,9 +104,9 @@ document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('tabSensorBtn').addEventListener('click', function(){ showTab('sensorTab', this); });
   document.getElementById('tabWifiBtn').addEventListener('click', function(){ showTab('wifiTab', this); });
   document.getElementById('tabServerBtn').addEventListener('click', function(){ showTab('serverTab', this); });
-});
 
-fetchReadings();
-fetchWifiCredentials();
-fetchServerInfo();
-setInterval(fetchReadings, 5000);
+  fetchReadings();
+  startPolling(fetchWifiCredentials, 1000);
+  startPolling(fetchServerInfo, 1000);
+  setInterval(fetchReadings, 5000);
+});
