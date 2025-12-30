@@ -64,11 +64,11 @@ esp_err_t web_client_post(const char *path, const char* payload_raw_str, const c
 
     if (host_port == 0)
     {
-        asprintf(&url_buffer, "%s%s", host_url, path);
+        asprintf(&url_buffer, "http://%s%s", host_url, path);
     }
     else
     {
-        asprintf(&url_buffer, "%s:%d%s", host_url, host_port, path);
+        asprintf(&url_buffer, "http://%s:%d%s", host_url, host_port, path);
     }
 
     esp_http_client_config_t config = {
