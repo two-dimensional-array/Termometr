@@ -36,15 +36,6 @@ void termometr_init(void)
     sensor.i2c_handler.bus = &bus_handle;
     sensor.measure_resolution = HTU21D_MEASURE_RESOLUTION_RH11_TEMP11;
     HTU21D_Init(&sensor);
-
-    measurement_timer_handle = xTimerCreateStatic(
-        "TermometrMeasurementTimer",
-        pdMS_TO_TICKS(TERMOMETR_MEASUREMENT_INTERVAL_MS),
-        pdTRUE,
-        NULL,
-        measurement_timer_callback,
-        &measurement_timer
-    );
 }
 
 void termometr_deinit(void)
@@ -58,10 +49,19 @@ void termometr_deinit(void)
 
 void termometr_start(void)
 {
-    if (measurement_timer_handle)
+    if (measurement_timer_handle == NULL)
     {
-        xTimerStart(measurement_timer_handle, portMAX_DELAY);
+        measurement_timer_handle = xTimerCreateStatic(
+            "TermometrMeasurementTimer",
+            pdMS_TO_TICKS(TERMOMETR_MEASUREMENT_INTERVAL_MS),
+            pdTRUE,
+            NULL,
+            measurement_timer_callback,
+            &measurement_timer
+        );
     }
+
+    xTimerStart(measurement_timer_handle, portMAX_DELAY);
 }
 
 void termometr_stop(void)
