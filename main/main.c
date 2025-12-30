@@ -10,6 +10,8 @@
 #include "termometr.h"
 #include "web_client.h"
 
+#define SEND_TO_SERVER_MEASURMENT_RETRIES 5
+
 static bool get_termometr_request(const cJSON * payload, cJSON * response);
 static bool set_wifi_credentials_request(const cJSON * payload, cJSON * response);
 static bool get_wifi_credentials_request(const cJSON * payload, cJSON * response);
@@ -89,7 +91,11 @@ void app_main(void)
 
         char *json_str = cJSON_PrintUnformatted(root);
 
-        esp_err_t web_client_result = web_client_post("/termometer", json_str, "application/json");
+        esp_err_t web_client_result = ESP_FAIL;
+        for (size_t try = 0; (try < SEND_TO_SERVER_MEASURMENT_RETRIES) && (web_client_result != ESP_OK); ++try)
+        {
+            web_client_result = web_client_post("/termometer", json_str, "application/json");
+        }
 
         if (json_str)
         {
