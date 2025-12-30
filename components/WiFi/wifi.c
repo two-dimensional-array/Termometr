@@ -9,6 +9,7 @@
 #include "esp_wifi.h"
 
 #define WIFI_CONECT_STA_TIMEOUT_MS 10000
+#define WIFI_CONECT_STA_RETRIES_COUNT 5
 
 static const char *TAG = "wifi";
 
@@ -33,7 +34,10 @@ wifi_state_t wifi_init()
     if (read_wifi_credentials(sta_ssid, ssid_len, sta_password, password_len))
     {
         ESP_LOGI(TAG, "Found saved WiFi credentials: ssid=%s, password=%s", sta_ssid, sta_password[0] ? sta_password : "<empty>");
-        start_sta = wifi_connect_sta(sta_ssid, sta_password, WIFI_CONECT_STA_TIMEOUT_MS) == ESP_OK;
+        for (size_t try = 0; (try < WIFI_CONECT_STA_RETRIES_COUNT) && (!start_sta); ++try)
+        {
+            start_sta = wifi_connect_sta(sta_ssid, sta_password, WIFI_CONECT_STA_TIMEOUT_MS) == ESP_OK;
+        }
     }
     else
     {
