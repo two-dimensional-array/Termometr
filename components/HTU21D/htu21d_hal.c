@@ -1,6 +1,6 @@
 #include "htu21d_hal.h"
 
-static const int TRANSFER_TIMEOUT_MS = 10000;
+static const int TRANSFER_TIMEOUT_MS = 10;
 
 bool HTU21D_HAL_I2C_Init(htu21d_i2c_t* i2c_handler)
 {
@@ -8,7 +8,7 @@ bool HTU21D_HAL_I2C_Init(htu21d_i2c_t* i2c_handler)
     {
         .dev_addr_length = I2C_ADDR_BIT_LEN_7,
         .device_address = 0x40,
-        .scl_speed_hz = 100000,
+        .scl_speed_hz = 400000,
     };
 
     return (i2c_master_bus_add_device(*i2c_handler->bus, &config, &i2c_handler->device) == ESP_OK);

@@ -7,8 +7,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/timers.h"
 
-#define HTU21D_I2C_SDA_GPIO GPIO_NUM_8
-#define HTU21D_I2C_SCL_GPIO GPIO_NUM_9
+#define HTU21D_I2C_SDA_GPIO GPIO_NUM_0
+#define HTU21D_I2C_SCL_GPIO GPIO_NUM_1
 
 static i2c_master_bus_handle_t bus_handle;
 static htu21d_t sensor;
@@ -29,7 +29,7 @@ void termometr_init(void)
         .scl_io_num = HTU21D_I2C_SCL_GPIO,
         .clk_source = I2C_CLK_SRC_DEFAULT,
         .glitch_ignore_cnt = 7,
-        .flags.enable_internal_pullup = true,
+        .flags.enable_internal_pullup = false,
     };
     ESP_ERROR_CHECK(i2c_new_master_bus(&bus_config, &bus_handle));
 
