@@ -9,6 +9,7 @@
 #include "wifi.h"
 #include "termometr.h"
 #include "web_client.h"
+#include "power_control.h"
 
 #define SEND_TO_SERVER_MEASURMENT_RETRIES 5
 
@@ -73,6 +74,9 @@ void app_main(void)
 
     ESP_ERROR_CHECK(nvs_result);
 
+    power_control_init();
+    power_control_set_state(true);
+
     termometr_init();
 
     if ((wifi_init() == WIFI_STATE_STA) && (web_client_init() == ESP_OK))
@@ -109,8 +113,9 @@ void app_main(void)
 
         if (web_client_result == ESP_OK)
         {
+            power_control_set_state(false);
             wifi_stop();
-            esp_sleep_enable_timer_wakeup(30 * 1000 * 1000); // 30 seconds
+            esp_sleep_enable_timer_wakeup(60 * 1000 * 1000); // 60 seconds
             esp_deep_sleep_start();
             esp_restart();
             return;
