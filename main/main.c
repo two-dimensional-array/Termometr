@@ -1,7 +1,6 @@
 #include "esp_log.h"
 #include "nvs_flash.h"
 #include "esp_system.h"
-#include "esp_sleep.h"
 #include "esp_mac.h"
 #include "cJSON.h"
 
@@ -10,6 +9,7 @@
 #include "termometr.h"
 #include "web_client.h"
 #include "power_control.h"
+#include "sleep_control.h"
 
 #define SEND_TO_SERVER_MEASURMENT_RETRIES 5
 
@@ -74,6 +74,7 @@ void app_main(void)
 
     ESP_ERROR_CHECK(nvs_result);
 
+    sleep_contol_init();
     power_control_init();
     power_control_set_state(true);
     termometr_init();
@@ -114,10 +115,7 @@ void app_main(void)
         if (web_client_result == ESP_OK)
         {
             wifi_stop();
-            esp_sleep_enable_timer_wakeup(15 * 60 * 1000 * 1000); // 15 minutes
-            esp_deep_sleep_start();
-            esp_restart();
-            return;
+            sleep_contol_sleep();
         }
     }
 
