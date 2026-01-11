@@ -76,7 +76,6 @@ void app_main(void)
 
     power_control_init();
     power_control_set_state(true);
-
     termometr_init();
 
     if ((wifi_init() == WIFI_STATE_STA) && (web_client_init() == ESP_OK))
@@ -85,7 +84,8 @@ void app_main(void)
 
         esp_efuse_mac_get_default((uint8_t*)&id);
         termometr_single_measurement();
-        
+        power_control_set_state(false);
+
         // Build JSON payload
         cJSON *root = cJSON_CreateObject();
         cJSON_AddNumberToObject(root, "id", id);
@@ -113,15 +113,14 @@ void app_main(void)
 
         if (web_client_result == ESP_OK)
         {
-            power_control_set_state(false);
             wifi_stop();
-            esp_sleep_enable_timer_wakeup(60 * 1000 * 1000); // 60 seconds
+            esp_sleep_enable_timer_wakeup(15 * 60 * 1000 * 1000); // 15 minutes
             esp_deep_sleep_start();
             esp_restart();
             return;
         }
     }
-    
+
     termometr_start();
 
     web_server_register_api_handler(&termometr_api_handler);
